@@ -4,6 +4,7 @@
 #include "tcpConnection.hpp"
 #include "tcpReno.hpp"
 #include "tcpNewReno.hpp"
+#include "BBR.hpp"
 
 int main()
 {
@@ -13,11 +14,16 @@ int main()
         data[i] = i;
     }
 
-    cout << "-------------------NEW Reno-------------------" << endl;
-    TCPNewReno tcp(data);
-    tcp.run();
-    cout << "-------------------RENO-----------------------" << endl;
-    TCPReno tcp2(data);
-    tcp2.run();
+    // cout << "-------------------RENO-----------------------" << endl;
+    // TCPReno tcp1(data);
+    // tcp1.run();
+
+    // cout << "-------------------NEW Reno-------------------" << endl;
+    // TCPNewReno tcp2(data);
+    // tcp2.run();
+
+    cout << "-------------------BBR------------------------" << endl;
+    BBR tcp3(data);
+    tcp3.run();
     return 0;
 }

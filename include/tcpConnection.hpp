@@ -14,9 +14,9 @@ const int SLOW_START = 0;
 const int CONGESTION_AVOIDANCE = 1;
 const int FAST_RETRANSMIT = 2;
 
-const int SSTHRESH = numeric_limits<int>::max();
-//const int SSTHRESH = 1;
-const int CWND = 1000;
+// const int SSTHRESH = numeric_limits<int>::max();
+const int SSTHRESH = 1000;
+const int CWND = 1;
 
 struct SlidingWindow
 {
