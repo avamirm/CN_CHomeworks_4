@@ -21,7 +21,7 @@ void TCPConnection::packetize(vector<int> &data)
 {
     for (int i = 0; i < data.size(); i++)
     {
-        Packet p = {data[i], false};
+        Packet p = {data[i], false, false};
         packets.push_back(p);
     }
 }

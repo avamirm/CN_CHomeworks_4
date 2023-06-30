@@ -3,8 +3,7 @@
 
 #include "tcpConnection.hpp"
 #include "tcpReno.hpp"
-
-const int DATA_SIZE = 100000;
+#include "tcpNewReno.hpp"
 
 int main()
 {
@@ -13,7 +12,12 @@ int main()
     {
         data[i] = i;
     }
-    TCPReno tcp(data);
+
+    cout << "-------------------NEW------------------------" << endl;
+    TCPNewReno tcp(data);
     tcp.run();
+    cout << "-------------------RENO-----------------------" << endl;
+    TCPReno tcp2(data);
+    tcp2.run();
     return 0;
 }

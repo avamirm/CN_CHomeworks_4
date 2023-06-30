@@ -1,13 +1,13 @@
-#ifndef __TCPRENO_H__
-#define __TCPRENO_H__
+#ifndef __TCPNEWRENO_H__
+#define __TCPNEWRENO_H__
 
 #include "tcpConnection.hpp"
 
-class TCPReno : public TCPConnection
+class TCPNewReno : public TCPConnection
 {
 public:
-    TCPReno(vector<int> &data) : TCPConnection(data){};
-    TCPReno(vector<int> &data, int cwnd, int ssthresh) : TCPConnection(data, cwnd, ssthresh){};
+    TCPNewReno(vector<int> &data) : TCPConnection(data){};
+    TCPNewReno(vector<int> &data, int cwnd, int ssthresh) : TCPConnection(data, cwnd, ssthresh){};
     void sendData() override;
     bool onePacketLoss() override;
     void oneRTTUpdate() override;
@@ -18,5 +18,6 @@ private:
     int mode = 0;
     int dupAckCount = 0;
     bool packetLost = false;
+    vector<bool> sacks = vector<bool>(packets.size(), false);
 };
 #endif

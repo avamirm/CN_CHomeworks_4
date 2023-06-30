@@ -1,40 +1,53 @@
-#include "tcpReno.hpp"
+#include "tcpNewReno.hpp"
 
-float TCPReno::lostProb(int num, int start, int end)
+float TCPNewReno::lostProb(int num, int start, int end)
 {
     return (pow(10 * end, static_cast<float>(num - start) / (end - start)) - 1) / (10 * end - 1);
 }
 
-bool TCPReno::isPacketLost()
-{
+bool TCPNewReno::isPacketLost(){
     int prob = static_cast<int>(advwnd * lostProb(_cwnd, 1, advwnd));
     bool isPacketLost = (rand() % advwnd + 1) > prob;
     return isPacketLost;
 }
 
-void TCPReno::sendData()
+void TCPNewReno::sendData()
 {
-    if (timeout != 0)
+    if (sw.lastAck + 1 == static_cast<int>(packets.size()) || timeout != 0)
         return;
 
     dupAckCount = 0;
     packetLost = false;
     int lastAck = sw.lastAck;
-    for (int i = lastAck; i < lastAck + _cwnd && i < static_cast<int>(packets.size()); i++)
+    int sackCount = 0;
+    for (int i = lastAck; i < sackCount + lastAck + _cwnd && i < static_cast<int>(packets.size()); i++)
     {
+        if (packets[i].sack)
+        {
+            sackCount++;
+            if (!packetLost)
+                sw.lastAck++;
+            continue;
+        }
         if (isPacketLost())
         {
             if (packetLost)
+            {
                 dupAckCount++;
+                packets[i].sack = true;
+            }
             else
+            {
+                packets[i].sack = true;
                 sw.lastAck++;
+            }
         }
         else
             packetLost = true;
     }
 }
 
-bool TCPReno::onePacketLoss()
+bool TCPNewReno::onePacketLoss()
 {
     if (timeout != 0)
     {
@@ -61,7 +74,7 @@ bool TCPReno::onePacketLoss()
     return false;
 }
 
-void TCPReno::oneRTTUpdate()
+void TCPNewReno::oneRTTUpdate()
 {
     if (mode == SLOW_START)
     {

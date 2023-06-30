@@ -4,20 +4,15 @@
 #include <vector>
 #include <algorithm>
 #include <limits>
+#include <cmath>
 using namespace std;
 
 const int TIMEOUT = 2;
+const int DATA_SIZE = 100000;
 
 const int SLOW_START = 0;
 const int CONGESTION_AVOIDANCE = 1;
 const int FAST_RETRANSMIT = 2;
-
-enum Level
-{
-    slowStart,
-    congestionAvoidance,
-    fastRetransmit
-};
 
 struct SlidingWindow
 {
@@ -30,6 +25,7 @@ struct Packet
 {
     int data;
     bool ack;
+    bool sack;
 };
 
 class TCPConnection
