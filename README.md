@@ -184,7 +184,7 @@ void TCPReno::oneRTTUpdate()
 ![reno,cwnd=1,ssthresh=10](/images/reno,cwnd=1,ssthresh=10.png "reno,cwnd=1,ssthresh=10")
 As we can see when we decrease the initial ssthresh to 10, it takes more RTTs to send the data thus the performance is worse in this case because we reach the threshold sooner and decrease the cwnd sooner and can't use the whole cwnd effectively.
 
-![renoChart](/images/renoChart.png "renoChart")
+![renoChart](/images/renoChart.jpg "renoChart")
 As we can see cwnd increases until finding the threshold and then after recieving three duplicate ACKs, the mode changes to fast retransmit. Fast retransmit are obviously visible in the chart.
 
 - TCPNewReno
@@ -271,26 +271,41 @@ As we can see like Reno protocol when we decrease the initial ssthresh to 10, it
 In this function we send the packets. At first we set the packetLost to false and foe every packet we change lastAck and packetLost if needed. If the mode is ProbeRTT, we set the minRTT to the minimum of estimatedRTT and miRTT
 
 ```cpp
-void TCPReno::sendData()
+void BBR::sendData()
 {
     packetLost = false;
     int lastAck = sw.lastAck;
     for (int i = lastAck; i < lastAck + _cwnd && i < static_cast<int>(packets.size()); i++)
     {
         if (isPacketLost())
+        {
             if (!packetLost)
                 sw.lastAck++;
-            else
-                packetLost = true;
+        }
+        else
+            packetLost = true;
+    }
+
+    if (mode == PROBE_RTT)
+    {
+        float rand1 = static_cast<float>(30 + rand() % (200 - 30 + 1));
+        float rand2 = (rand() % 100 + 1) / 100;
+        estRtt = static_cast<float>(rand1 + rand2);
+        minRtt = min(minRtt, estRtt);
+    }
+    else if (mode == PROBE_BANDWIDTH)
+    {
+        isbwIncrease = !isbwIncrease;
     }
 }
+
 ```
 
 ## onePacketLoss
 BBR has 5 modes. The STARTUP mode is like slow start in TCP Reno. Congestion window size grows exponentially until packet loss happens and then we decrease some percent of cwnd size and do this with different percentages until no loss happens. If packetLost is true and the mode is startup, we set it to drain and if it is drain, we set it to probeBw.
 
 ```cpp
-bool TCPReno::onePacketLoss()
+bool BBR::onePacketLoss()
 {
     if (packetLost)
     {
@@ -301,10 +316,12 @@ bool TCPReno::onePacketLoss()
     }
     else
     {
-        if (mode == DRAIN){
+        if (mode == DRAIN)
+        {
             mode = PROBE_BANDWIDTH;
         }
-    }    
+    }
+    return false;
 }
 ```
 
@@ -313,26 +330,59 @@ bool TCPReno::onePacketLoss()
 ## oneRTTUpdate
 As mentioned earlier in startup mode, the cwnd increases exponentially. In drain mode we decrease cwnd and set it to a percentage of it. in probBandwidth mode we increase cwnd by multiplying a number between 1 and 2 to the cwnd that we have. In prob_RTT mode we set cwnd to the min cwnd.
 ```cpp
-void TCPReno::oneRTTUpdate()
+void BBR::oneRTTUpdate()
 {
+    if (mode != DRAIN && mode != STARTUP)
+    {
+        probRttCounter--;
+        if (probRttCounter == 0)
+        {
+            probRttCounter = INTERVAL + WAIT_RTT;
+            minRtt = 1000;
+            actualCwnd = _cwnd;
+            mode = PROBE_RTT;
+        }
+
+        if (probRttCounter == INTERVAL)
+        {
+            _cwnd = actualCwnd;
+            mode = PROBE_BANDWIDTH;
+            return;
+        }
+    }
+
     if (mode == STARTUP)
     {
         _cwnd *= 2;
     }
+
     else if (mode == DRAIN)
     {
         _cwnd *= (1 - sendProb);
         sendProb -= 0.02;
+        actualCwnd = _cwnd;
     }
+
     else if (mode == PROBE_BANDWIDTH)
     {
+        if (isbwIncrease)
+        {
+            _cwnd = actualCwnd;
+            _cwnd *= 1.05;
+        }
+        else
+        {
+            _cwnd *= 0.95;
+        }
     }
+
     else if (mode == PROBE_RTT)
     {
+        _cwnd = 25;
     }
 }
 ```
-
+  ![bbr](/images/bbr.jpg "bbr")
 
 # Questions
 
