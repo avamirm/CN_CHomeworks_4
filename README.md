@@ -174,6 +174,15 @@ void TCPReno::oneRTTUpdate()
     }
 }
 ```
+### TCP Reno with ssthresh = INF & cwnd = 1:
+  ![reno,cwnd=1,ssthresh=inf](/images/reno,cwnd=1,ssthresh=inf.png "reno,cwnd=1,ssthresh=inf")
+
+### TCP Reno with ssthresh = INF & cwnd = 200:
+  ![reno,cwnd=200,ssthresh=inf](/images/reno,cwnd=200,ssthresh=inf.png "reno,cwnd=200,ssthresh=inf")
+ As we can see when we increase the initial cwnd to 200, it takes less RTTs to send the data thus the performance is better in this case because we send more data at first and the cwnd grow sooner but we cannot always set cwnd to a big number because it may cause timeout sooner.
+### TCP Reno with ssthresh = 10 & cwnd = 1:
+![reno,cwnd=1,ssthresh=10](/images/reno,cwnd=1,ssthresh=10.png "reno,cwnd=1,ssthresh=10")
+As we can see when we decrease the initial ssthresh to 10, it takes more RTTs to send the data thus the performance is worse in this case because we reach the threshold sooner and decrease the cwnd sooner and can't use the whole cwnd effectively.
 
 - TCPNewReno
 
@@ -242,20 +251,15 @@ void TCPNewReno::sendData()
 ```
 The two other methods in New Reno including onePacketLoss() and oneRTTUpdate() is like Reno.
 
+### TCP newReno with ssthresh = INF & cwnd = 1:
+  ![newReno,cwnd=1,ssthresh=inf](/images/newReno,cwnd=1,ssthresh=inf.png "newReno,cwnd=1,ssthresh=inf")
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+### TCP newReno with ssthresh = INF & cwnd = 200:
+  ![newReno,cwnd=200,ssthresh=inf](/images/newReno,cwnd=200,ssthresh=inf.png "newReno,cwnd=200,ssthresh=inf")
+ As we can see like Reno protocol when we increase the initial cwnd to 200, it takes less RTTs to send the data thus the performance is better in this case because we send more data at first and the cwnd grow sooner but we cannot always set cwnd to a big number because it may cause timeout sooner.
+### TCP newReno with ssthresh = 10 & cwnd = 1:
+  ![newReno,cwnd=1,ssthresh=10](/images/newReno,cwnd=1,ssthresh=10.png "newReno,cwnd=1,ssthresh=10")
+As we can see like Reno protocol when we decrease the initial ssthresh to 10, it takes more RTTs to send the data thus the performance is worse in this case because we reach the threshold sooner and decrease the cwnd sooner and can't use the whole cwnd effectively.
 
 
 # Questions

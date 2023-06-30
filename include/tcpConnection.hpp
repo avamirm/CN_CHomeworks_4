@@ -8,11 +8,15 @@
 using namespace std;
 
 const int TIMEOUT = 2;
-const int DATA_SIZE = 100000;
+const int DATA_SIZE = 10000;
 
 const int SLOW_START = 0;
 const int CONGESTION_AVOIDANCE = 1;
 const int FAST_RETRANSMIT = 2;
+
+const int SSTHRESH = numeric_limits<int>::max();
+//const int SSTHRESH = 1;
+const int CWND = 1000;
 
 struct SlidingWindow
 {
@@ -40,8 +44,8 @@ public:
     void run();
 
 protected:
-    int _cwnd = 1;
-    int _ssthresh = numeric_limits<int>::max();
+    int _cwnd = CWND;
+    int _ssthresh = SSTHRESH;
     int _rtt = 0;
     int timeout = 0;
     int advwnd = 1000;

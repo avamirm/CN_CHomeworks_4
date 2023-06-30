@@ -6,7 +6,8 @@ float TCPNewReno::lostProb(int num, int start, int end)
 }
 
 bool TCPNewReno::isPacketLost(){
-    int prob = static_cast<int>(advwnd * lostProb(_cwnd, 1, advwnd));
+    double lostP = advwnd * lostProb(_cwnd, 1, advwnd);
+    int prob = static_cast<int>(lostP);
     bool isPacketLost = (rand() % advwnd + 1) > prob;
     return isPacketLost;
 }
@@ -15,6 +16,8 @@ void TCPNewReno::sendData()
 {
     if (sw.lastAck + 1 == static_cast<int>(packets.size()) || timeout != 0)
         return;
+    // double lostP = advwnd * lostProb(_cwnd, 1, advwnd);
+    // cout << "packet loss probability: " << 1 - lostP << endl;
 
     dupAckCount = 0;
     packetLost = false;

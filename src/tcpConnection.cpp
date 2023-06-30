@@ -33,6 +33,7 @@ void TCPConnection::printStatus()
 
 void TCPConnection::run()
 {
+    cout <<  "initial_cwnd: " << CWND << " initial_ssthresh: " << SSTHRESH << " data_size: " << DATA_SIZE << endl;
     while (sw.lastAck != static_cast<int>(packets.size()))
     {
         printStatus();
